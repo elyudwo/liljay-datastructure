@@ -1,0 +1,133 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#define SIZE 100
+typedef int element;
+
+typedef struct HeapType
+{
+    element heap[SIZE];
+    int n;
+}HeapType;
+
+void init(HeapType* HT)
+{
+    HT->n = 0;
+}
+
+void upHeap(HeapType* HT)
+{
+    int i = HT->n;
+    int k = HT->heap[i];
+
+    while ((i != 1) && (k < HT->heap[i / 2]))
+    {
+        HT->heap[i] = HT->heap[i / 2];
+        i /= 2;
+    }
+    HT->heap[i] = k;
+}
+
+void insertItem(HeapType* HT, element k)
+{
+    HT->n++;
+    HT->heap[HT->n] = k;
+    upHeap(HT);
+}
+
+void downHeap(HeapType* HT)
+{
+    int temp = HT->heap[1];
+    int p = 1, c = 2;
+
+    while (c <= HT->n)
+    {
+        if ((c < HT->n) && (HT->heap[c + 1] < HT->heap[c]))
+            c++;
+        if (temp <= HT->heap[c])
+            break;
+        HT->heap[p] = HT->heap[c];
+        p = c;
+        c *= 2;
+    }
+    HT->heap[p] = temp;
+
+}
+
+int removeItem(HeapType* HT)
+{
+    int k = HT->heap[1];
+    HT->heap[1] = HT->heap[HT->n];
+    HT->n--;
+    downHeap(HT);
+    return k;
+}
+
+void printHeap(HeapType* HT)
+{
+    for (int i = 1; i <= HT->n; i++)
+        printf("[%d] ", HT->heap[i]);
+    printf("\n");
+}
+
+void heapSort(HeapType* HT1, element H[])
+{
+    HeapType HT2;
+    init(&HT2);
+    for (int i = 1; i < HT1->n; i++)
+    {
+        HT2.heap[i] = HT1->heap[i];
+        HT2.n++;
+    }
+
+    for (int i = 1; i <= HT1->n; i++)
+        H[i] = removeItem(&HT2);
+}
+
+void inPlaceHeapSort(HeapType* HT)
+{
+    int n = HT->n;
+    int key;
+    for (int i = 0; i < n; i++)
+    {
+        key = removeItem(HT);
+        HT->heap[HT->n + 1] = key;
+    }
+}
+
+void printArray(int H[], int n)
+{
+    for (int i = 1; i <= n; i++)
+        printf("[%d] ", H[i]);
+    printf("\n");
+}
+
+int main()
+{
+    HeapType HT;
+    init(&HT);
+    element H[SIZE];
+
+    srand(time(NULL));
+
+    for (int i = 0; i < 7; i++)
+    {
+        int k = rand() % 100 + 1;
+        insertItem(&HT, k);
+        printf("[%d] ", k);
+    }
+    printf("\n");   getchar();
+    printHeap(&HT); getchar();
+
+    printf("Min Value : %d\n", removeItem(&HT));
+    printHeap(&HT);   getchar();
+    
+    heapSort(&HT, H);
+    printArray(H, HT.n);    getchar();
+
+    int n = HT.n;
+    inPlaceHeapSort(&HT);
+    printArray(HT.heap, n);
+
+    return 0;
+}
